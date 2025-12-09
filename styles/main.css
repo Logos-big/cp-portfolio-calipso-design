@@ -21,9 +21,11 @@ body {
     background-color: #D4D4D4;
     display: flex;
     flex-direction: column;
-    padding-top: 200px;
-    padding-bottom: 200px;
-    gap: 10px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
     max-width: 100%;
     max-height: 100vh;
     overflow: hidden;
@@ -32,7 +34,7 @@ body {
 
 .frame-1 {
     width: 1440px;
-    height: 624px;
+    height: 880px;
     background-color: #F9F9F9;
     display: flex;
     flex-direction: row;
@@ -66,17 +68,18 @@ body {
     .main {
         width: 100%;
         height: 100vh;
-        padding-top: calc(200px * 100 / 1024);
-        padding-bottom: calc(200px * 100 / 1024);
+        padding-top: calc(40px * 100 / 1024);
+        padding-bottom: calc(40px * 100 / 1024);
+        gap: calc(40px * 100 / 1024);
     }
     
     .frame-1 {
         width: 100%;
-        height: calc(624px * 100 / 1024);
+        height: calc(880px * 100 / 1024);
         padding-left: calc(200px * 100 / 1440);
         padding-right: calc(200px * 100 / 1440);
-        padding-top: calc(162px * 100 / 624);
-        padding-bottom: calc(162px * 100 / 624);
+        padding-top: calc(162px * 100 / 880);
+        padding-bottom: calc(162px * 100 / 880);
     }
     
     .lgoos-test {

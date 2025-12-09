@@ -15,13 +15,13 @@
   /* Spacing from Figma */
   --spacing-main-width : 1440.0px;
   --spacing-main-height : 1024.0px;
-  --spacing-main-padding-top : 200.0px;
-  --spacing-main-padding-bottom : 200.0px;
-  --spacing-main-item-spacing : 10.0px;
-  --spacing-lgoos-test-width : 1040.0px;
+  --spacing-main-padding-top : 40.0px;
+  --spacing-main-padding-bottom : 40.0px;
+  --spacing-main-item-spacing : 40.0px;
+  --spacing-lgoos-test-width : 1440.0px;
   --spacing-lgoos-test-height : 24.0px;
   --spacing-frame-1-width : 1440.0px;
-  --spacing-frame-1-height : 624.0px;
+  --spacing-frame-1-height : 880.0px;
   --spacing-frame-1-padding-left : 200.0px;
   --spacing-frame-1-padding-right : 200.0px;
   --spacing-frame-1-padding-top : 162.0px;
