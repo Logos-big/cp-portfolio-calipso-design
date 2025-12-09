@@ -1,6 +1,22 @@
 @echo off
-chcp 65001 >nul
-cd /d "%~dp0"
-powershell -ExecutionPolicy Bypass -File scripts\auto-update.ps1
-pause
+echo ========================================
+echo Updating from Figma...
+echo ========================================
+echo.
 
+cd /d "%~dp0"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\auto-update.ps1'"
+
+if %errorlevel% equ 0 (
+    echo.
+    echo ========================================
+    echo Update completed successfully!
+    echo ========================================
+) else (
+    echo.
+    echo ========================================
+    echo Error occurred. Check the output above.
+    echo ========================================
+)
+
+pause

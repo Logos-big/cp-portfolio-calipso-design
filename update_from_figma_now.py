@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Get fresh data from Figma and update HTML
+Quick update script to fetch fresh data from Figma and update HTML
 """
+
 import json
-import os
-import sys
 import urllib.request
 import urllib.parse
+import os
+import sys
 
-# Paths
-script_dir = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.join(script_dir, "scripts", "figma-config.json")
-data_path = os.path.join(script_dir, "figma-data.json")
-
-print("=== Updating from Figma ===")
-print()
-
-# Load config
+# Read config
+config_path = "scripts/figma-config.json"
 if not os.path.exists(config_path):
-    print("Error: Config file not found")
+    print(f"Error: Config file not found at {config_path}")
     sys.exit(1)
 
 with open(config_path, 'r', encoding='utf-8') as f:
@@ -27,202 +21,167 @@ with open(config_path, 'r', encoding='utf-8') as f:
 
 file_key = config.get('fileKey')
 token = config.get('token')
-node_ids = config.get('nodeIds', ['67:5539'])
+node_ids = config.get('nodeIds', [])
 
-if not file_key or file_key == "YOUR_FIGMA_FILE_KEY":
-    print("Error: Set FILE_KEY in scripts/figma-config.json")
+if not file_key or not token:
+    print("Error: Missing fileKey or token in config")
     sys.exit(1)
 
-if not token or token == "YOUR_FIGMA_TOKEN":
-    print("Error: Set TOKEN in scripts/figma-config.json")
-    sys.exit(1)
+# Build API URL
+if node_ids:
+    node_ids_str = ','.join(node_ids)
+    url = f"https://api.figma.com/v1/files/{file_key}/nodes?ids={node_ids_str}"
+else:
+    url = f"https://api.figma.com/v1/files/{file_key}"
 
-# Convert nodeIds for URL
-node_ids_for_url = [nid.replace(':', '-') for nid in node_ids]
-nodes_param = ','.join(node_ids_for_url)
+# Make request
+headers = {
+    'X-Figma-Token': token
+}
 
-# Get data from Figma
-print("Step 1: Fetching data from Figma API...")
-url = f"https://api.figma.com/v1/files/{file_key}/nodes?ids={nodes_param}"
-req = urllib.request.Request(url)
-req.add_header('X-Figma-Token', token)
-
+print("Connecting to Figma API...")
 try:
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req) as response:
         data = json.loads(response.read().decode('utf-8'))
-    
-    print("  Data received!")
-    
-    # Save data
-    with open(data_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    
-    print("  Data saved to figma-data.json")
-    print()
-    
+        print("Data received!")
+        
+        # Save data
+        with open('figma-data.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        print("Data saved to figma-data.json")
+        
+except urllib.error.HTTPError as e:
+    if e.code == 429:
+        print("Warning: Rate limit exceeded (429)")
+        print("Using cached data from figma-data.json")
+        if not os.path.exists('figma-data.json'):
+            print("Error: No cached data available")
+            sys.exit(1)
+    else:
+        print(f"Error: {e.code} - {e.reason}")
+        sys.exit(1)
 except Exception as e:
-    print(f"Error fetching data: {e}")
+    print(f"Error: {e}")
     sys.exit(1)
 
-# Find Main node
-print("Step 2: Generating HTML from Main frame...")
+# Load data
+with open('figma-data.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
 
+# Find Main node
 def find_main_node(data):
     if 'nodes' in data:
         for node_key in data['nodes']:
-            node = data['nodes'][node_key].get('document')
-            if node and node.get('name') == 'Main' and node.get('type') == 'FRAME':
+            node = data['nodes'][node_key].get('document', {})
+            if node.get('name') == 'Main' and node.get('type') == 'FRAME':
                 return node
     return None
 
 main_node = find_main_node(data)
 
 if not main_node:
-    print("Error: Main node not found in data")
+    print("Error: Main node not found")
     sys.exit(1)
 
-print(f"  Found Main frame")
-if 'absoluteBoundingBox' in main_node:
-    w = main_node['absoluteBoundingBox']['width']
-    h = main_node['absoluteBoundingBox']['height']
-    print(f"  Size: {w}x{h}px")
-if 'children' in main_node:
-    print(f"  Elements: {len(main_node['children'])}")
-print()
+print(f"Found Main frame: {main_node.get('absoluteBoundingBox', {}).get('width', 0)}x{main_node.get('absoluteBoundingBox', {}).get('height', 0)}px")
 
 # Generate HTML
 def rgb_to_hex(r, g, b):
     return f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}"
 
-def generate_html_from_node(node, level=0):
+def generate_html(node, level=0):
     indent = "    " * level
     html = ""
     
-    node_type = node.get('type', '')
-    node_name = node.get('name', 'unnamed')
-    class_name = ''.join(c if c.isalnum() else '-' for c in node_name).lower()
-    
-    if node_type in ['FRAME', 'GROUP']:
-        style_attrs = []
+    if node.get('type') in ['FRAME', 'GROUP']:
+        class_name = node.get('name', '').lower().replace(' ', '-').replace('_', '-')
+        style_parts = []
         
-        if 'absoluteBoundingBox' in node:
-            w = node['absoluteBoundingBox']['width']
-            h = node['absoluteBoundingBox']['height']
-            style_attrs.append(f"width: {w}px")
-            style_attrs.append(f"height: {h}px")
+        bbox = node.get('absoluteBoundingBox', {})
+        if bbox:
+            style_parts.append(f"width: {bbox.get('width', 0)}.0px")
+            style_parts.append(f"height: {bbox.get('height', 0)}.0px")
         
-        # Layout mode
-        if 'layoutMode' in node:
-            if node['layoutMode'] == 'HORIZONTAL':
-                style_attrs.append("display: flex")
-                style_attrs.append("flex-direction: row")
-            elif node['layoutMode'] == 'VERTICAL':
-                style_attrs.append("display: flex")
-                style_attrs.append("flex-direction: column")
+        layout_mode = node.get('layoutMode')
+        if layout_mode == 'HORIZONTAL':
+            style_parts.append("display: flex")
+            style_parts.append("flex-direction: row")
+        elif layout_mode == 'VERTICAL':
+            style_parts.append("display: flex")
+            style_parts.append("flex-direction: column")
         
-        # Padding
-        for prop in ['paddingLeft', 'paddingRight', 'paddingTop', 'paddingBottom']:
-            if prop in node:
-                css_prop = prop[0].lower() + prop[1:].replace('Left', '-left').replace('Right', '-right').replace('Top', '-top').replace('Bottom', '-bottom')
-                style_attrs.append(f"{css_prop}: {node[prop]}px")
+        if node.get('paddingLeft'):
+            style_parts.append(f"padding-left: {node.get('paddingLeft')}.0px")
+        if node.get('paddingRight'):
+            style_parts.append(f"padding-right: {node.get('paddingRight')}.0px")
+        if node.get('paddingTop'):
+            style_parts.append(f"padding-top: {node.get('paddingTop')}.0px")
+        if node.get('paddingBottom'):
+            style_parts.append(f"padding-bottom: {node.get('paddingBottom')}.0px")
         
-        # Gap
-        if 'itemSpacing' in node:
-            style_attrs.append(f"gap: {node['itemSpacing']}px")
+        if node.get('itemSpacing'):
+            style_parts.append(f"gap: {node.get('itemSpacing')}.0px")
         
-        # Align items
-        if 'counterAxisAlignItems' in node and node['counterAxisAlignItems'] == 'CENTER':
-            style_attrs.append("align-items: center")
-        if 'primaryAxisAlignItems' in node and node['primaryAxisAlignItems'] == 'CENTER':
-            style_attrs.append("justify-content: center")
+        if node.get('counterAxisAlignItems') == 'CENTER':
+            style_parts.append("align-items: center")
+        if node.get('primaryAxisAlignItems') == 'CENTER':
+            style_parts.append("justify-content: center")
         
-        # Background color
-        if 'backgroundColor' in node:
-            c = node['backgroundColor']
-            hex_color = rgb_to_hex(c['r'], c['g'], c['b'])
-            style_attrs.append(f"background-color: {hex_color}")
-        elif 'background' in node and len(node['background']) > 0:
+        bg_color = node.get('backgroundColor')
+        if bg_color:
+            hex_color = rgb_to_hex(bg_color.get('r', 0), bg_color.get('g', 0), bg_color.get('b', 0))
+            style_parts.append(f"background-color: {hex_color}")
+        elif node.get('background') and len(node.get('background', [])) > 0:
             bg = node['background'][0]
             if bg.get('type') == 'SOLID':
-                c = bg['color']
-                hex_color = rgb_to_hex(c['r'], c['g'], c['b'])
-                style_attrs.append(f"background-color: {hex_color}")
+                c = bg.get('color', {})
+                hex_color = rgb_to_hex(c.get('r', 0), c.get('g', 0), c.get('b', 0))
+                style_parts.append(f"background-color: {hex_color}")
         
-        style = f" style='{'; '.join(style_attrs)}'" if style_attrs else ""
-        html += f"{indent}<div class='{class_name}'{style}>\n"
+        style_attr = f" style='{'; '.join(style_parts)}'" if style_parts else ""
+        html += f"{indent}<div class='{class_name}'{style_attr}>\n"
         
-        if 'children' in node:
-            for child in node['children']:
-                html += generate_html_from_node(child, level + 1)
+        for child in node.get('children', []):
+            html += generate_html(child, level + 1)
         
         html += f"{indent}</div>\n"
     
-    elif node_type in ['RECTANGLE', 'ELLIPSE', 'VECTOR']:
-        style_attrs = []
-        
-        if 'absoluteBoundingBox' in node:
-            w = node['absoluteBoundingBox']['width']
-            h = node['absoluteBoundingBox']['height']
-            style_attrs.append(f"width: {w}px")
-            style_attrs.append(f"height: {h}px")
-        
-        if 'fills' in node and len(node['fills']) > 0:
-            fill = node['fills'][0]
-            if fill.get('type') == 'SOLID':
-                c = fill['color']
-                hex_color = rgb_to_hex(c['r'], c['g'], c['b'])
-                style_attrs.append(f"background-color: {hex_color}")
-        
-        style = f" style='{'; '.join(style_attrs)}'" if style_attrs else ""
-        html += f"{indent}<div class='{class_name}'{style}></div>\n"
-    
-    elif node_type == 'TEXT':
+    elif node.get('type') == 'TEXT':
+        class_name = node.get('name', '').lower().replace(' ', '-').replace('_', '-')
         text = node.get('characters', '')
-        style_attrs = []
+        style_parts = []
         
-        if 'absoluteBoundingBox' in node:
-            w = node['absoluteBoundingBox']['width']
-            h = node['absoluteBoundingBox']['height']
-            style_attrs.append(f"width: {w}px")
-            style_attrs.append(f"height: {h}px")
+        bbox = node.get('absoluteBoundingBox', {})
+        if bbox:
+            style_parts.append(f"width: {bbox.get('width', 0)}.0px")
+            style_parts.append(f"height: {bbox.get('height', 0)}.0px")
         
-        if 'style' in node:
-            style_obj = node['style']
-            if 'fontSize' in style_obj:
-                style_attrs.append(f"font-size: {style_obj['fontSize']}px")
-            if 'fontFamily' in style_obj:
-                style_attrs.append(f"font-family: {style_obj['fontFamily']}, sans-serif")
-            if 'fontWeight' in style_obj:
-                style_attrs.append(f"font-weight: {style_obj['fontWeight']}")
-            if 'lineHeightPx' in style_obj:
-                style_attrs.append(f"line-height: {style_obj['lineHeightPx']}px")
-            if 'letterSpacing' in style_obj:
-                style_attrs.append(f"letter-spacing: {style_obj['letterSpacing']}px")
-            if 'textAlignHorizontal' in style_obj:
-                style_attrs.append(f"text-align: {style_obj['textAlignHorizontal'].lower()}")
+        style = node.get('style', {})
+        if style:
+            style_parts.append(f"font-size: {style.get('fontSize', 16)}.0px")
+            style_parts.append(f"font-family: {style.get('fontFamily', 'sans-serif')}, sans-serif")
+            style_parts.append(f"font-weight: {style.get('fontWeight', 400)}")
+            style_parts.append(f"line-height: {style.get('lineHeightPx', 16)}.0px")
+            style_parts.append(f"letter-spacing: {style.get('letterSpacing', 0)}.0px")
+            
+            text_align = style.get('textAlignHorizontal', 'LEFT').lower()
+            style_parts.append(f"text-align: {text_align}")
         
-        if 'fills' in node and len(node['fills']) > 0:
-            fill = node['fills'][0]
-            if fill.get('type') == 'SOLID':
-                c = fill['color']
-                hex_color = rgb_to_hex(c['r'], c['g'], c['b'])
-                style_attrs.append(f"color: {hex_color}")
+        fills = node.get('fills', [])
+        if fills and len(fills) > 0 and fills[0].get('type') == 'SOLID':
+            c = fills[0].get('color', {})
+            hex_color = rgb_to_hex(c.get('r', 0), c.get('g', 0), c.get('b', 0))
+            style_parts.append(f"color: {hex_color}")
         
-        style = f" style='{'; '.join(style_attrs)}'" if style_attrs else ""
-        html += f"{indent}<p class='{class_name}'{style}>{text}</p>\n"
-    
-    elif node_type in ['COMPONENT', 'INSTANCE']:
-        html += f"{indent}<div class='{class_name} component'>\n"
-        if 'children' in node:
-            for child in node['children']:
-                html += generate_html_from_node(child, level + 1)
-        html += f"{indent}</div>\n"
+        style_attr = f" style='{'; '.join(style_parts)}'" if style_parts else ""
+        html += f"{indent}<p class='{class_name}'{style_attr}>{text}</p>\n"
     
     return html
 
-html_content = generate_html_from_node(main_node)
+html_content = generate_html(main_node)
 
-# Create full HTML
+# Generate full HTML
 full_html = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -238,11 +197,8 @@ full_html = f"""<!DOCTYPE html>
 </html>"""
 
 # Save HTML
-html_path = os.path.join(script_dir, "index.html")
-with open(html_path, 'w', encoding='utf-8') as f:
+with open('index.html', 'w', encoding='utf-8') as f:
     f.write(full_html)
 
-print("  HTML updated: index.html")
-print()
-print("=== Done! Page updated ===")
-
+print("HTML generated and saved to index.html")
+print("Done!")
