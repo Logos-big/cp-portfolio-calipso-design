@@ -1,0 +1,20 @@
+{
+  "name": "cp-portfolio-calipso-design",
+  "version": "1.0.0",
+  "description": "Portfolio website for Calipso Design",
+  "scripts": {
+    "figma-sync": "powershell -ExecutionPolicy Bypass -File scripts/figma-sync.ps1",
+    "figma-sync:node": "node scripts/figma-sync.js",
+    "update": "powershell -ExecutionPolicy Bypass -File scripts/auto-update.ps1"
+  },
+  "keywords": [
+    "portfolio",
+    "design",
+    "interior"
+  ],
+  "author": "ED",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
+

@@ -1,0 +1,30 @@
+﻿:root {
+
+  /* Colors from Figma */
+  --color-main : #D4D4D4;
+  --color-lgoos-test : #3B3333;
+  --color-frame-1 : #F9F9F9;
+
+  /* Typography from Figma */
+  --font-lgoos-test-family : 'Montserrat', sans-serif;
+  --font-lgoos-test-size : 22.0px;
+  --font-lgoos-test-weight : 400;
+  --font-lgoos-test-line-height : 24.0px;
+  --font-lgoos-test-letter-spacing : -0.32px;
+
+  /* Spacing from Figma */
+  --spacing-main-width : 1440.0px;
+  --spacing-main-height : 1024.0px;
+  --spacing-main-padding-top : 200.0px;
+  --spacing-main-padding-bottom : 200.0px;
+  --spacing-main-item-spacing : 10.0px;
+  --spacing-lgoos-test-width : 1040.0px;
+  --spacing-lgoos-test-height : 24.0px;
+  --spacing-frame-1-width : 1440.0px;
+  --spacing-frame-1-height : 624.0px;
+  --spacing-frame-1-padding-left : 200.0px;
+  --spacing-frame-1-padding-right : 200.0px;
+  --spacing-frame-1-padding-top : 162.0px;
+  --spacing-frame-1-padding-bottom : 162.0px;
+  --spacing-frame-1-item-spacing : 10.0px;
+}

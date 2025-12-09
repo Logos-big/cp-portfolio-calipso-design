@@ -31,3 +31,8 @@ build/
 # Конфигурационные файлы (если содержат секреты)
 config.json
 deploy-config.json
+scripts/figma-config.json
+figma-data.json
+
+# Временные файлы для папок
+.gitkeep
