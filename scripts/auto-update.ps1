@@ -280,4 +280,48 @@ $fullHTML | Out-File -FilePath $htmlPath -Encoding UTF8
 
 Write-Host "  HTML updated: index.html" -ForegroundColor Green
 Write-Host ""
-Write-Host "=== Done! Page updated ===" -ForegroundColor Green
+
+# Step 3: Auto-update site on GitHub Pages
+Write-Host "Step 3: Updating site on GitHub Pages..." -ForegroundColor Yellow
+
+$projectRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $projectRoot
+
+# Check if git is available
+$gitPath = (Get-Command git -ErrorAction SilentlyContinue).Source
+if (-not $gitPath) {
+    Write-Host "  Warning: Git not found. Skipping GitHub Pages update." -ForegroundColor Yellow
+    Write-Host "  Run manually: git add . && git commit -m 'Update from Figma' && git push origin main" -ForegroundColor Cyan
+} else {
+    Write-Host "  Adding changes to git..." -ForegroundColor Cyan
+    & $gitPath add . 2>&1 | Out-Null
+    
+    Write-Host "  Creating commit..." -ForegroundColor Cyan
+    $commitMsg = "Update from Figma - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    $commitResult = & $gitPath commit -m $commitMsg 2>&1
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  Pushing to GitHub..." -ForegroundColor Cyan
+        $pushResult = & $gitPath push origin main 2>&1
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  Site update pushed to GitHub!" -ForegroundColor Green
+            Write-Host "  Site will update in 1-2 minutes at:" -ForegroundColor Cyan
+            Write-Host "  https://Logos-big.github.io/cp-portfolio-calipso-design/" -ForegroundColor White
+        } else {
+            Write-Host "  Warning: git push failed" -ForegroundColor Yellow
+            Write-Host "  Run manually: git push origin main" -ForegroundColor Cyan
+        }
+    } else {
+        # Check if there were no changes
+        if ($commitResult -match "nothing to commit") {
+            Write-Host "  No changes to commit" -ForegroundColor Yellow
+        } else {
+            Write-Host "  Warning: git commit failed" -ForegroundColor Yellow
+            Write-Host "  Run manually: git commit -m 'Update from Figma' && git push origin main" -ForegroundColor Cyan
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "=== Done! Page updated from Figma ===" -ForegroundColor Green
