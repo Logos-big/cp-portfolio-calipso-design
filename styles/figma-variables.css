@@ -1,43 +1,14 @@
 ﻿:root {
-
-  /* Colors from Figma */
-  --color-main : #D4D4D4;
-  --color-lgoos-test : #3B3333;
-  --color-frame-1 : #F9F9F9;
-  --color-copiryte : #3B3333;
-
-  /* Typography from Figma */
+  --color-main : #d4d4d4;
+  --color-lgoos-test : #3b3333;
+  --color-frame-2 : #000000;
+  --color-copiryte : #3b3333;
+  --color-frame-1 : #f9f9f9;
   --font-lgoos-test-family : 'Montserrat', sans-serif;
-  --font-lgoos-test-size : 16.0px;
-  --font-lgoos-test-weight : 500;
-  --font-lgoos-test-line-height : 20.0px;
-  --font-lgoos-test-letter-spacing : 0.0px;
+  --font-lgoos-test-size : 22.0px;
+  --font-lgoos-test-weight : 400;
   --font-copiryte-family : 'Aboreto', sans-serif;
   --font-copiryte-size : 12.0px;
   --font-copiryte-weight : 400;
-  --font-copiryte-line-height : 16.0px;
-  --font-copiryte-letter-spacing : 0.0px;
-
-  /* Spacing from Figma */
-  --spacing-main-width : 1440.0px;
-  --spacing-main-height : 1024.0px;
-  --spacing-main-padding-top : 40.0px;
-  --spacing-main-padding-bottom : 40.0px;
-  --spacing-main-item-spacing : 40.0px;
-  --spacing-lgoos-test-width : 1440.0px;
-  --spacing-lgoos-test-height : 20.0px;
-  --spacing-frame-1-width : 1440.0px;
-  --spacing-frame-1-height : 828.0px;
-  --spacing-frame-1-padding-left : 200.0px;
-  --spacing-frame-1-padding-right : 200.0px;
-  --spacing-frame-1-padding-top : 162.0px;
-  --spacing-frame-1-padding-bottom : 162.0px;
-  --spacing-frame-1-item-spacing : 10.0px;
-  --spacing-frame-2-width : 1440.0px;
-  --spacing-frame-2-height : 16.0px;
-  --spacing-frame-2-padding-left : 80.0px;
-  --spacing-frame-2-padding-right : 80.0px;
-  --spacing-frame-2-item-spacing : 10.0px;
-  --spacing-copiryte-width : 1280.0px;
-  --spacing-copiryte-height : 16.0px;
 }
+
