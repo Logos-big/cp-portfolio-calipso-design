@@ -34,7 +34,7 @@ body {
 
 .frame-1 {
     width: 1440px;
-    height: 880px;
+    height: 828px;
     background-color: #F9F9F9;
     display: flex;
     flex-direction: row;
@@ -46,6 +46,19 @@ body {
     padding-bottom: 162px;
     gap: 10px;
     overflow: hidden;
+    box-sizing: border-box;
+}
+
+.frame-2 {
+    width: 1440px;
+    height: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-left: 80px;
+    padding-right: 80px;
+    gap: 10px;
     box-sizing: border-box;
 }
 
@@ -64,6 +77,21 @@ body {
     box-sizing: border-box;
 }
 
+.copiryte {
+    width: 1280px;
+    height: 16px;
+    font-family: 'Aboreto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #3B3333;
+    text-align: left;
+    letter-spacing: 0px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 @media (max-width: 1440px) {
     .main {
         width: 100%;
@@ -75,15 +103,27 @@ body {
     
     .frame-1 {
         width: 100%;
-        height: calc(880px * 100 / 1024);
+        height: calc(828px * 100 / 1024);
         padding-left: calc(200px * 100 / 1440);
         padding-right: calc(200px * 100 / 1440);
-        padding-top: calc(162px * 100 / 880);
-        padding-bottom: calc(162px * 100 / 880);
+        padding-top: calc(162px * 100 / 828);
+        padding-bottom: calc(162px * 100 / 828);
+    }
+    
+    .frame-2 {
+        width: 100%;
+        height: 16px;
+        padding-left: calc(80px * 100 / 1440);
+        padding-right: calc(80px * 100 / 1440);
     }
     
     .lgoos-test {
         width: 100%;
         font-size: clamp(16px, 1.5vw, 22px);
+    }
+    
+    .copiryte {
+        width: 100%;
+        font-size: clamp(10px, 0.8vw, 12px);
     }
 }

@@ -1,5 +1,10 @@
 # Auto-update script from Figma
 # Usage: .\scripts\auto-update.ps1
+#
+# IMPORTANT: This script follows STRICTLY the Figma design system and layout
+# - Only generates elements that exist in the Figma design
+# - Only applies styles from the Figma design
+# - Does NOT add any extra elements or styles not in the design
 
 $configPath = Join-Path $PSScriptRoot "figma-config.json"
 $dataPath = Join-Path (Split-Path $PSScriptRoot -Parent) "figma-data.json"
@@ -55,12 +60,36 @@ try {
     Write-Host ""
     
 } catch {
-    Write-Host "Sync error: $_" -ForegroundColor Red
-    exit 1
+    $errorMsg = $_.Exception.Message
+    if ($errorMsg -match "429" -or $errorMsg -match "Rate limit") {
+        Write-Host "  Warning: Rate limit exceeded (429)" -ForegroundColor Yellow
+        Write-Host "  Using cached data from figma-data.json" -ForegroundColor Cyan
+        Write-Host "  Wait 1-2 minutes before trying again" -ForegroundColor Yellow
+        Write-Host ""
+        
+        # Use existing data if available
+        if (Test-Path $dataPath) {
+            Write-Host "  Using existing cached data..." -ForegroundColor Cyan
+            Write-Host ""
+        } else {
+            Write-Host "  Error: No cached data available" -ForegroundColor Red
+            Write-Host "  Please wait 1-2 minutes and try again" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "Sync error: $_" -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Step 2: Generate HTML from data
 Write-Host "Step 2: Generating HTML from Main frame..." -ForegroundColor Yellow
+
+# Load data (either fresh or cached)
+if (-not (Test-Path $dataPath)) {
+    Write-Host "Error: No data file found" -ForegroundColor Red
+    exit 1
+}
 
 $data = Get-Content $dataPath -Raw | ConvertFrom-Json
 
@@ -92,12 +121,16 @@ Write-Host "  Size: $($mainNode.absoluteBoundingBox.width)x$($mainNode.absoluteB
 Write-Host "  Elements: $($mainNode.children.Count)" -ForegroundColor White
 Write-Host ""
 
-# Generate HTML
+# Generate HTML - STRICTLY following Figma design system
+# Only generates what exists in the design, nothing extra
 function Generate-HTMLFromNode {
     param($node, $level = 0)
     
     $html = ""
     $indent = "    " * $level
+    
+    # Generate HTML based ONLY on Figma node data
+    # No additional elements or styles are added
     
     if ($node.type -eq "FRAME" -or $node.type -eq "GROUP") {
         $className = ($node.name -replace '[^a-zA-Z0-9]', '-').ToLower()
