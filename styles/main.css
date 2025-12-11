@@ -24,8 +24,8 @@ body {
 /* Контейнер с видео и lottie */
 .video-lottie-container {
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
+    height: calc(100vh - 20vh);
+    min-height: calc(100vh - 150px);
     display: flex;
     flex-direction: row;
     overflow: hidden;
@@ -37,8 +37,8 @@ body {
 /* Видео контейнер - занимает все доступное пространство */
 .video-container {
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
+    height: 100%;
+    min-height: 100%;
     overflow: hidden;
     background-color: #000;
     display: flex;
@@ -497,6 +497,11 @@ body {
 
 /* Сохранение размера картинок при высоте 746px и больше */
 @media (min-height: 746px) {
+    .video-lottie-container {
+        height: calc(100vh - 150px) !important;
+        min-height: calc(100vh - 150px) !important;
+    }
+    
     .content-container {
         height: 150px !important;
         min-height: 150px !important;
@@ -550,6 +555,11 @@ body {
 
 /* При высоте меньше 756px карусель не уменьшается */
 @media (max-height: 756px) {
+    .video-lottie-container {
+        height: calc(100vh - 150px) !important;
+        min-height: calc(100vh - 150px) !important;
+    }
+    
     .content-container {
         height: 150px !important;
         min-height: 150px !important;
@@ -604,8 +614,8 @@ body {
 @media (max-width: 768px) {
     .video-lottie-container {
         flex-direction: row;
-        height: 100vh;
-        min-height: 100vh;
+        height: calc(100vh - 20vh);
+        min-height: calc(100vh - 150px);
         padding-bottom: 0;
     }
     
@@ -616,8 +626,8 @@ body {
     
     .video-container {
         width: 100%;
-        height: 100vh;
-        min-height: 100vh;
+        height: 100%;
+        min-height: 100%;
     }
     
     .lottie-container {
