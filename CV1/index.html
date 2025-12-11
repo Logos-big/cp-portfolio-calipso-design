@@ -111,11 +111,6 @@
         };
         
         window.addEventListener('unhandledrejection', rejectionHandler, {capture: true, passive: false});
-        
-        // Дополнительный перехват через setTimeout для раннего выполнения
-        setTimeout(function() {
-            window.addEventListener('unhandledrejection', rejectionHandler, {capture: true, passive: false});
-        }, 0);
     })();
     </script>
     <meta charset="UTF-8">
@@ -376,6 +371,16 @@ let customScrollAnimation = null;
 let savedCarouselPosition = null; // Сохраняем текущую позицию карусели (null = не сохранена)
 let isCarouselPaused = false; // Флаг паузы карусели
 let carouselCurrentX = 0; // Текущая позиция X для карусели
+// Сохраняем ссылки на обработчики для правильного удаления
+let carouselMouseEnterHandler = null;
+let carouselMouseLeaveHandler = null;
+let carouselWheelHandler = null;
+let carouselTouchStartHandler = null;
+let carouselTouchMoveHandler = null;
+let carouselTouchEndHandler = null;
+// Переменные для touch событий
+let touchStartX = 0;
+let isTouching = false;
 
 function initSwiper() {
     if (carouselSwiper) {
@@ -440,24 +445,42 @@ function startCustomAutoScroll(swiper) {
     wrapper.style.transform = `translateX(${currentX}px)`;
     wrapper.style.transition = 'none';
     
-    // Обработчики для паузы при наведении
-    const handleMouseEnter = () => {
+    // Удаляем старые обработчики если есть
+    if (carouselMouseEnterHandler) {
+        container.removeEventListener('mouseenter', carouselMouseEnterHandler);
+    }
+    if (carouselMouseLeaveHandler) {
+        container.removeEventListener('mouseleave', carouselMouseLeaveHandler);
+    }
+    
+    // Создаем новые обработчики и сохраняем ссылки
+    carouselMouseEnterHandler = () => {
         isCarouselPaused = true;
     };
     
-    const handleMouseLeave = () => {
+    carouselMouseLeaveHandler = () => {
         isCarouselPaused = false;
     };
     
-    // Удаляем старые обработчики если есть
-    container.removeEventListener('mouseenter', handleMouseEnter);
-    container.removeEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('mouseenter', carouselMouseEnterHandler);
+    container.addEventListener('mouseleave', carouselMouseLeaveHandler);
     
-    container.addEventListener('mouseenter', handleMouseEnter);
-    container.addEventListener('mouseleave', handleMouseLeave);
+    // Удаляем старые обработчики wheel и touch если есть
+    if (carouselWheelHandler) {
+        container.removeEventListener('wheel', carouselWheelHandler);
+    }
+    if (carouselTouchStartHandler) {
+        container.removeEventListener('touchstart', carouselTouchStartHandler);
+    }
+    if (carouselTouchMoveHandler) {
+        container.removeEventListener('touchmove', carouselTouchMoveHandler);
+    }
+    if (carouselTouchEndHandler) {
+        container.removeEventListener('touchend', carouselTouchEndHandler);
+    }
     
     // Обработка скролла колесом мыши
-    container.addEventListener('wheel', (e) => {
+    carouselWheelHandler = (e) => {
         e.preventDefault();
         isCarouselPaused = true;
         
@@ -470,19 +493,21 @@ function startCustomAutoScroll(swiper) {
         container.wheelTimeout = setTimeout(() => {
             isCarouselPaused = false;
         }, 2000);
-    });
+    };
+    container.addEventListener('wheel', carouselWheelHandler);
     
     // Обработка свайпа (touch)
-    let touchStartX = 0;
-    let isTouching = false;
+    touchStartX = 0;
+    isTouching = false;
     
-    container.addEventListener('touchstart', (e) => {
+    carouselTouchStartHandler = (e) => {
         isTouching = true;
         isCarouselPaused = true;
         touchStartX = e.touches[0].clientX;
-    });
+    };
+    container.addEventListener('touchstart', carouselTouchStartHandler);
     
-    container.addEventListener('touchmove', (e) => {
+    carouselTouchMoveHandler = (e) => {
         if (!isTouching) return;
         e.preventDefault();
         
@@ -494,9 +519,10 @@ function startCustomAutoScroll(swiper) {
         applyInfiniteScroll(wrapper, currentX);
         
         touchStartX = touchX;
-    });
+    };
+    container.addEventListener('touchmove', carouselTouchMoveHandler);
     
-    container.addEventListener('touchend', () => {
+    carouselTouchEndHandler = () => {
         if (isTouching) {
             isTouching = false;
             // Возобновляем автопрокрутку через некоторое время
@@ -504,7 +530,8 @@ function startCustomAutoScroll(swiper) {
                 isCarouselPaused = false;
             }, 2000);
         }
-    });
+    };
+    container.addEventListener('touchend', carouselTouchEndHandler);
     
     function animate() {
         if (isCarouselPaused || !swiper || !wrapper) {
