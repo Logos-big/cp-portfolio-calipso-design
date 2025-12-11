@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проект - Calipso Design</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/project.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+    <div class="project-page">
+        <!-- Хедер проекта -->
+        <header class="project-header" id="project-header">
+            <h1 class="project-title" id="project-title">Название проекта</h1>
+            <div class="header-buttons">
+                <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
+                <button class="delete-project-btn" id="delete-project-btn">Удалить проект</button>
+            </div>
+        </header>
+
+        <!-- Блок описания -->
+        <section class="project-description-section">
+            <div class="description-content" id="project-description">
+                Описание проекта...
+            </div>
+        </section>
+
+        <!-- Блок с синхронной каруселью сравнения -->
+        <section class="comparison-section">
+            <div class="comparison-carousels">
+                <!-- Карусель чертежей -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Чертежи</h3>
+                    <div class="swiper comparison-swiper" id="drawings-swiper">
+                        <div class="swiper-wrapper" id="drawings-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карусель фото -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Фото</h3>
+                    <div class="swiper comparison-swiper" id="photos-swiper">
+                        <div class="swiper-wrapper" id="photos-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карусель рендеров -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Рендеры</h3>
+                    <div class="swiper comparison-swiper" id="renders-swiper">
+                        <div class="swiper-wrapper" id="renders-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Модалка для увеличения изображений -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content image-modal-content">
+            <div class="modal-close-lottie" id="modal-close-lottie"></div>
+            <img class="modal-image" id="modal-image" src="" alt="">
+            <div class="modal-upload-section">
+                <input type="file" id="modal-upload-file" accept="image/*" style="display: none;">
+                <button class="upload-image-btn" id="upload-image-btn">+ Добавить фото</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="scripts/project.js"></script>
+</body>
+</html>
+

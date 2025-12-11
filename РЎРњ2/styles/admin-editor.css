@@ -1,0 +1,314 @@
+/* Стили для админки - визуально повторяет главную страницу */
+
+.admin-main {
+    position: relative;
+}
+
+/* Панель управления */
+.admin-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-btn {
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: 'Montserrat', sans-serif;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.admin-btn:hover {
+    background-color: rgba(0, 0, 0, 1);
+    transform: scale(1.05);
+}
+
+.edit-mode-btn.active {
+    background-color: #4CAF50;
+}
+
+.save-btn {
+    background-color: #2196F3;
+}
+
+.save-btn:hover {
+    background-color: #1976D2;
+}
+
+.cancel-btn {
+    background-color: #f44336;
+}
+
+.cancel-btn:hover {
+    background-color: #d32f2f;
+}
+
+.view-site-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.add-project-btn {
+    background-color: #4CAF50;
+}
+
+.add-project-btn:hover {
+    background-color: #45a049;
+}
+
+/* Режим редактирования */
+.edit-mode .carousel-item {
+    cursor: move;
+    position: relative;
+}
+
+.edit-mode .carousel-item::before {
+    content: '⋮⋮';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.edit-mode .carousel-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.edit-mode .carousel-item.drag-over {
+    border: 2px dashed #2196F3;
+    border-radius: 4px;
+}
+
+/* Футер с папками проектов */
+.admin-footer {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+    max-height: 30vh;
+    overflow-y: auto;
+}
+
+.projects-folders {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.project-folder {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-folder:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.folder-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #000;
+}
+
+.folder-count {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.folder-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.folder-thumbnail {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.folder-thumbnail.empty {
+    background-color: rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: 0.8rem;
+}
+
+/* Индикатор изменений */
+.changes-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ff9800;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: none;
+    z-index: 2000;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.changes-indicator.show {
+    display: block;
+}
+
+/* Анимация сохранения */
+.saving {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    z-index: 3000;
+    font-family: 'Montserrat', sans-serif;
+    display: none;
+}
+
+.saving.show {
+    display: block;
+}
+
+/* Модалка создания проекта */
+.new-project-modal-content {
+    max-width: 500px;
+    width: 90%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.new-project-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.form-input-file {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.preview-image-container {
+    position: relative;
+    margin-top: 10px;
+    display: inline-block;
+    max-width: 200px;
+}
+
+.preview-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.remove-preview-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.remove-preview-btn:hover {
+    background-color: #d32f2f;
+}
+

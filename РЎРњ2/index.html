@@ -1,0 +1,740 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script>
+    // Самый ранний перехват ошибок расширений браузера
+    (function() {
+        'use strict';
+        
+        // Функция проверки на ошибки расширений
+        const isExtensionError = function(msg) {
+            if (!msg) return false;
+            const str = String(msg);
+            return str.includes('Could not establish connection') || 
+                   str.includes('Receiving end does not exist') ||
+                   str.includes('Extension context invalidated') ||
+                   str.includes('chrome-extension://') ||
+                   str.includes('moz-extension://') ||
+                   str.includes('safari-extension://');
+        };
+        
+        // Перехватываем console.error ДО того, как что-либо загрузится
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function(...args) {
+            try {
+                const msg = args.join(' ');
+                if (isExtensionError(msg)) {
+                    return;
+                }
+                originalError.apply(console, args);
+            } catch(e) {
+                originalError.apply(console, args);
+            }
+        };
+        
+        console.warn = function(...args) {
+            try {
+                const msg = args.join(' ');
+                if (isExtensionError(msg)) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            } catch(e) {
+                originalWarn.apply(console, args);
+            }
+        };
+        
+        // Глобальный обработчик ошибок
+        const errorHandler = function(msg, url, line, col, error) {
+            try {
+                if (isExtensionError(msg) || (url && isExtensionError(url))) {
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        };
+        
+        // Устанавливаем обработчик ошибок
+        const oldOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, error) {
+            if (errorHandler(msg, url, line, col, error)) {
+                return true;
+            }
+            if (oldOnError) {
+                return oldOnError(msg, url, line, col, error);
+            }
+            return false;
+        };
+        
+        // Обработчик событий error
+        const errorEventListener = function(e) {
+            try {
+                const msg = e.message || e.error?.message || '';
+                const filename = e.filename || '';
+                if (isExtensionError(msg) || isExtensionError(filename)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    return false;
+                }
+            } catch(e) {}
+        };
+        
+        // Добавляем обработчики с максимальным приоритетом
+        window.addEventListener('error', errorEventListener, {capture: true, passive: false});
+        if (document) {
+            document.addEventListener('error', errorEventListener, {capture: true, passive: false});
+        }
+        
+        // Обработчик необработанных промисов - самый важный для этой ошибки
+        const rejectionHandler = function(e) {
+            try {
+                const reason = e.reason;
+                let msg = '';
+                if (reason) {
+                    if (reason instanceof Error) {
+                        msg = reason.message || reason.toString();
+                    } else {
+                        msg = String(reason);
+                    }
+                }
+                if (isExtensionError(msg)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    // Также подавляем вывод в консоль
+                    return false;
+                }
+            } catch(e) {}
+        };
+        
+        window.addEventListener('unhandledrejection', rejectionHandler, {capture: true, passive: false});
+        
+        // Дополнительный перехват через setTimeout для раннего выполнения
+        setTimeout(function() {
+            window.addEventListener('unhandledrejection', rejectionHandler, {capture: true, passive: false});
+        }, 0);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calipso Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/figma-variables.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+<div class="main">
+    <!-- Контейнер с видео и Lottie -->
+    <div class="video-lottie-container">
+        <div class="video-container">
+            <video class="top-video" autoplay muted loop playsinline>
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+            
+            <!-- Lottie контейнер в нижнем правом углу -->
+            <div class="lottie-container">
+                <div id="lottie-animation" class="lottie-animation"></div>
+                    </div>
+                </div>
+            </div>
+    
+    <!-- Контейнер с каруселью -->
+    <div class="content-container">
+        <div class="swiper carousel-swiper">
+            <div class="swiper-wrapper" id="carousel-track">
+                <!-- Картинки загружаются через JavaScript -->
+            </div>
+                </div>
+            </div>
+    
+    <div class="footer-container">
+        <p class="footer-text">Copiryte</p>
+        <a href="admin.html" class="admin-link" style="position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: rgba(0, 0, 0, 0.7); color: white; text-decoration: none; border-radius: 4px; z-index: 1000;">Админка</a>
+                    </div>
+                    </div>
+
+<!-- Модалка для просмотра картинок -->
+<div class="modal" id="image-modal">
+    <div class="modal-content image-modal-content">
+        <div class="modal-close-lottie" id="modal-close-lottie"></div>
+        <img class="modal-image" id="modal-image" src="" alt="">
+                    </div>
+                </div>
+
+<!-- Модалка с контактами -->
+<div class="modal" id="contacts-modal">
+    <div class="modal-content contacts-modal-content">
+        <div class="modal-close-lottie" id="contacts-modal-close-lottie"></div>
+        <div class="contacts-content">
+            <h2 class="contacts-title">Контакты</h2>
+            <div class="contacts-list">
+                <div class="contact-item">
+                    <span class="contact-label">Email:</span>
+                    <a href="mailto:contact@example.com" class="contact-value">contact@example.com</a>
+            </div>
+                <div class="contact-item">
+                    <span class="contact-label">Телефон:</span>
+                    <a href="tel:+1234567890" class="contact-value">+1 (234) 567-890</a>
+                    </div>
+                <div class="contact-item">
+                    <span class="contact-label">Телеграм:</span>
+                    <a href="https://t.me/username" target="_blank" class="contact-value">@username</a>
+                    </div>
+                <div class="contact-item">
+                    <span class="contact-label">Вопросы:</span>
+                    <span class="contact-value">Напишите нам, и мы ответим в ближайшее время</span>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                    </div>
+
+<script>
+// ============================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ============================================
+// Массив проектов для карусели
+let projectsData = [];
+
+// Загрузка данных проектов
+async function loadProjectsData() {
+    try {
+        // Сначала пытаемся загрузить из localStorage (если есть сохраненные изменения из админки)
+        const savedData = localStorage.getItem('projectsData');
+        if (savedData) {
+            try {
+                const parsedData = JSON.parse(savedData);
+                console.log('Данные из localStorage:', parsedData);
+                if (parsedData && parsedData.projects && Array.isArray(parsedData.projects) && parsedData.projects.length > 0) {
+                    projectsData = parsedData.projects;
+                    console.log('Данные загружены из localStorage (изменения из админки):', projectsData.length, 'проектов');
+                    return;
+                } else {
+                    console.log('Данные в localStorage пустые или некорректные, загружаем из файла');
+                }
+            } catch (e) {
+                console.error('Ошибка парсинга данных из localStorage:', e);
+                console.log('Загружаем из файла');
+            }
+        } else {
+            console.log('Нет данных в localStorage, загружаем из файла');
+        }
+        
+        // Загружаем из файла
+        const response = await fetch('data/projects.json');
+        const data = await response.json();
+        projectsData = data.projects || [];
+        console.log('Данные загружены из файла:', projectsData.length, 'проектов');
+    } catch (error) {
+        console.error('Ошибка загрузки данных проектов:', error);
+        projectsData = [];
+    }
+}
+
+// ============================================
+// УТИЛИТЫ
+// ============================================
+// Функция для получения позиции translateX из transform
+function getTransformX(element) {
+    if (!element) return 0;
+    
+    let transformValue = element.style.transform;
+    if (!transformValue || transformValue === 'none') {
+        const computedStyle = window.getComputedStyle(element);
+        transformValue = computedStyle.transform;
+    }
+    
+    if (transformValue && transformValue !== 'none') {
+        const match = transformValue.match(/translateX\(([^)]+)\)/);
+        if (match) {
+            const parsedX = parseFloat(match[1]);
+            if (!isNaN(parsedX)) return parsedX;
+        }
+        const matrixMatch = transformValue.match(/matrix\([^,]+,\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*([^,]+),\s*[^)]+\)/);
+        if (matrixMatch) {
+            const parsedX = parseFloat(matrixMatch[1]);
+            if (!isNaN(parsedX)) return parsedX;
+        }
+    }
+    return 0;
+}
+
+// Функция для применения бесконечного скролла
+function applyInfiniteScroll(wrapper, currentX) {
+    const slides = wrapper.querySelectorAll('.swiper-slide');
+    let totalWidth = 0;
+    slides.forEach(slide => totalWidth += slide.offsetWidth);
+    
+    if (totalWidth > 0) {
+        const halfWidth = totalWidth / 2;
+        if (Math.abs(currentX) >= halfWidth) {
+            currentX = currentX + halfWidth;
+        } else if (currentX > 0) {
+            currentX = currentX - halfWidth;
+        }
+        carouselCurrentX = currentX;
+        wrapper.style.transform = `translateX(${currentX}px)`;
+        wrapper.style.transition = 'none';
+    }
+    return currentX;
+}
+
+// ============================================
+// ЗАГРУЗКА LOTTIE АНИМАЦИЙ
+// ============================================
+function loadLottieAnimation(container, filePath) {
+    if (!container) return Promise.resolve(null);
+    
+    if (window.location.protocol === 'file:') {
+        if (!window.fileProtocolWarningShown) {
+            console.warn('⚠️ Страница открыта через file:// протокол. Используйте локальный сервер.');
+            window.fileProtocolWarningShown = true;
+        }
+        return Promise.resolve(null);
+    }
+    
+    return fetch(filePath)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
+        .then(animationData => {
+            if (typeof lottie === 'undefined') return null;
+            return lottie.loadAnimation({
+                container: container,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                animationData: animationData
+            });
+        })
+        .catch(() => null);
+}
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ LOTTIE АНИМАЦИЙ
+// ============================================
+function initLottieAnimations() {
+    // Основная Lottie на видео
+    const lottieAnimation = document.getElementById('lottie-animation');
+    if (lottieAnimation) {
+        loadLottieAnimation(lottieAnimation, 'lottie/main-lottie.json');
+    }
+    
+    // Lottie для закрытия модалки с картинкой
+    const modalCloseLottie = document.getElementById('modal-close-lottie');
+    if (modalCloseLottie) {
+        loadLottieAnimation(modalCloseLottie, 'lottie/cat.json').then(anim => {
+            if (anim) {
+                modalCloseLottie.addEventListener('click', closeImageModal);
+            }
+        });
+    }
+    
+    // Lottie для закрытия модалки с контактами
+    const contactsModalClose = document.getElementById('contacts-modal-close-lottie');
+    if (contactsModalClose) {
+        loadLottieAnimation(contactsModalClose, 'lottie/cat.json').then(anim => {
+            if (anim) {
+                contactsModalClose.addEventListener('click', closeContactsModal);
+            }
+        });
+    }
+}
+
+// ============================================
+// КАРУСЕЛЬ - Swiper.js
+// ============================================
+let carouselSwiper = null;
+const carouselTrack = document.getElementById('carousel-track');
+
+function loadCarouselImages() {
+    if (!carouselTrack) return;
+    
+    carouselTrack.innerHTML = '';
+    
+    // Сортируем проекты по порядку (поле order)
+    const sortedProjects = [...projectsData].sort((a, b) => {
+        return (a.order || 0) - (b.order || 0);
+    });
+    
+    console.log('Загружаем проекты в порядке:', sortedProjects.map(p => ({ id: p.id, name: p.name, order: p.order || 0 })));
+    
+    // Добавляем проекты в Swiper слайды
+    sortedProjects.forEach((project, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        
+        const item = document.createElement('div');
+        item.className = 'carousel-item';
+        
+        const img = document.createElement('img');
+        img.src = project.previewImage || 'images/photos/ComfyUI_00070_.png';
+        img.alt = project.name || `Project ${index + 1}`;
+        img.onerror = function() {
+            this.src = 'images/photos/ComfyUI_00070_.png';
+        };
+        
+        item.appendChild(img);
+        item.addEventListener('click', () => openImageModal(project.previewImage || 'images/photos/ComfyUI_00070_.png'));
+        
+        slide.appendChild(item);
+        carouselTrack.appendChild(slide);
+    });
+    
+    const initSwiperWhenReady = () => {
+        if (typeof Swiper !== 'undefined') {
+            initSwiper();
+            return true;
+        }
+        return false;
+    };
+    
+    if (!initSwiperWhenReady()) {
+        const checkSwiper = setInterval(() => {
+            if (initSwiperWhenReady()) clearInterval(checkSwiper);
+        }, 100);
+        setTimeout(() => clearInterval(checkSwiper), 5000);
+    }
+}
+
+let customScrollAnimation = null;
+let savedCarouselPosition = null; // Сохраняем текущую позицию карусели (null = не сохранена)
+let isCarouselPaused = false; // Флаг паузы карусели
+let carouselCurrentX = 0; // Текущая позиция X для карусели
+
+function initSwiper() {
+    if (carouselSwiper) {
+        carouselSwiper.destroy(true, true);
+    }
+    
+    const swiperEl = document.querySelector('.carousel-swiper');
+    if (!swiperEl) return;
+    
+    carouselSwiper = new Swiper('.carousel-swiper', {
+        slidesPerView: 'auto',
+        spaceBetween: 0,
+        loop: false, // Отключаем встроенный loop, используем свой
+        speed: 0, // Отключаем анимации Swiper
+        freeMode: {
+            enabled: false,
+        },
+        autoplay: false,
+        allowTouchMove: true,
+        grabCursor: true,
+        simulateTouch: true,
+        on: {
+            init: function() {
+                // Дублируем слайды для бесконечного скролла
+                const wrapper = this.wrapperEl;
+                const slides = Array.from(wrapper.querySelectorAll('.swiper-slide'));
+                slides.forEach(slide => {
+                    const clone = slide.cloneNode(true);
+                    wrapper.appendChild(clone);
+                });
+                
+                // Отключаем все обработчики Swiper для прокрутки
+                this.allowTouchMove = false;
+                this.allowSlideNext = false;
+                this.allowSlidePrev = false;
+                
+                // Запускаем кастомную автопрокрутку после небольшой задержки
+                setTimeout(() => {
+                    startCustomAutoScroll(this);
+                }, 300);
+            }
+        }
+    });
+}
+
+function startCustomAutoScroll(swiper) {
+    if (customScrollAnimation) {
+        cancelAnimationFrame(customScrollAnimation);
+    }
+    
+    const scrollSpeed = 0.5;
+    const wrapper = swiper.wrapperEl;
+    const container = swiper.el;
+    
+    // Получаем текущую позицию
+    let currentX = savedCarouselPosition !== null ? savedCarouselPosition : getTransformX(wrapper);
+    if (currentX === 0) currentX = carouselCurrentX;
+    carouselCurrentX = currentX;
+    if (savedCarouselPosition !== null) savedCarouselPosition = null;
+    
+    // Применяем позицию сразу
+    wrapper.style.transform = `translateX(${currentX}px)`;
+    wrapper.style.transition = 'none';
+    
+    // Обработчики для паузы при наведении
+    const handleMouseEnter = () => {
+        isCarouselPaused = true;
+    };
+    
+    const handleMouseLeave = () => {
+        isCarouselPaused = false;
+    };
+    
+    // Удаляем старые обработчики если есть
+    container.removeEventListener('mouseenter', handleMouseEnter);
+    container.removeEventListener('mouseleave', handleMouseLeave);
+    
+    container.addEventListener('mouseenter', handleMouseEnter);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    
+    // Обработка скролла колесом мыши
+    container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        isCarouselPaused = true;
+        
+        let currentX = getTransformX(wrapper) || carouselCurrentX;
+        currentX -= e.deltaY * 0.5;
+        applyInfiniteScroll(wrapper, currentX);
+        
+        // Возобновляем автопрокрутку через некоторое время после остановки скролла
+        clearTimeout(container.wheelTimeout);
+        container.wheelTimeout = setTimeout(() => {
+            isCarouselPaused = false;
+        }, 2000);
+    });
+    
+    // Обработка свайпа (touch)
+    let touchStartX = 0;
+    let isTouching = false;
+    
+    container.addEventListener('touchstart', (e) => {
+        isTouching = true;
+        isCarouselPaused = true;
+        touchStartX = e.touches[0].clientX;
+    });
+    
+    container.addEventListener('touchmove', (e) => {
+        if (!isTouching) return;
+        e.preventDefault();
+        
+        const touchX = e.touches[0].clientX;
+        const deltaX = touchStartX - touchX;
+        
+        let currentX = getTransformX(wrapper) || carouselCurrentX;
+        currentX -= deltaX * 0.5;
+        applyInfiniteScroll(wrapper, currentX);
+        
+        touchStartX = touchX;
+    });
+    
+    container.addEventListener('touchend', () => {
+        if (isTouching) {
+            isTouching = false;
+            // Возобновляем автопрокрутку через некоторое время
+            setTimeout(() => {
+                isCarouselPaused = false;
+            }, 2000);
+        }
+    });
+    
+    function animate() {
+        if (isCarouselPaused || !swiper || !wrapper) {
+            customScrollAnimation = requestAnimationFrame(animate);
+            return;
+        }
+        
+        // Используем глобальную переменную для текущей позиции
+        let animCurrentX = carouselCurrentX;
+        
+        // Получаем ширину всех слайдов
+        const slides = wrapper.querySelectorAll('.swiper-slide');
+        if (slides.length === 0) {
+            customScrollAnimation = requestAnimationFrame(animate);
+            return;
+        }
+        
+        let totalWidth = 0;
+        slides.forEach(slide => {
+            totalWidth += slide.offsetWidth;
+        });
+        
+        if (totalWidth === 0) {
+            customScrollAnimation = requestAnimationFrame(animate);
+            return;
+        }
+        
+        const halfWidth = totalWidth / 2;
+        
+        // Двигаем влево (отрицательное значение)
+        animCurrentX -= scrollSpeed;
+        
+        // Бесконечный цикл - когда достигаем половины, возвращаемся к началу
+        if (Math.abs(animCurrentX) >= halfWidth) {
+            animCurrentX = animCurrentX + halfWidth;
+        }
+        
+        // Сохраняем текущую позицию в глобальную переменную
+        carouselCurrentX = animCurrentX;
+        
+        // Применяем transform
+        wrapper.style.transform = `translateX(${animCurrentX}px)`;
+        wrapper.style.transition = 'none';
+        wrapper.style.willChange = 'transform';
+        
+        customScrollAnimation = requestAnimationFrame(animate);
+    }
+    
+    customScrollAnimation = requestAnimationFrame(animate);
+}
+
+
+// ============================================
+// МОДАЛКИ
+// ============================================
+const imageModal = document.getElementById('image-modal');
+const modalImage = document.getElementById('modal-image');
+const contactsModal = document.getElementById('contacts-modal');
+
+function openImageModal(imagePath) {
+    if (carouselSwiper?.wrapperEl) {
+        const x = getTransformX(carouselSwiper.wrapperEl);
+        if (x !== 0) {
+            savedCarouselPosition = x;
+            carouselCurrentX = x;
+        } else if (carouselCurrentX !== 0) {
+            savedCarouselPosition = carouselCurrentX;
+        }
+    }
+    isCarouselPaused = true;
+    if (customScrollAnimation) {
+        cancelAnimationFrame(customScrollAnimation);
+        customScrollAnimation = null;
+    }
+    modalImage.src = imagePath;
+    modalImage.classList.add('active');
+    imageModal.classList.add('active');
+}
+
+function closeImageModal() {
+    imageModal.classList.remove('active');
+    modalImage.classList.remove('active');
+    if (carouselSwiper) {
+        const swiper = carouselSwiper;
+        // Возобновляем движение с сохраненной позиции
+        setTimeout(() => {
+            isCarouselPaused = false;
+            startCustomAutoScroll(swiper);
+        }, 100);
+    }
+}
+
+function openContactsModal() {
+    if (carouselSwiper?.wrapperEl) {
+        const x = getTransformX(carouselSwiper.wrapperEl);
+        if (x !== 0) {
+            savedCarouselPosition = x;
+            carouselCurrentX = x;
+        } else if (carouselCurrentX !== 0) {
+            savedCarouselPosition = carouselCurrentX;
+        }
+    }
+    isCarouselPaused = true;
+    if (customScrollAnimation) {
+        cancelAnimationFrame(customScrollAnimation);
+        customScrollAnimation = null;
+    }
+    contactsModal.classList.add('active');
+}
+
+function closeContactsModal() {
+    contactsModal.classList.remove('active');
+    if (carouselSwiper) {
+        const swiper = carouselSwiper;
+        // Возобновляем движение с сохраненной позиции
+        setTimeout(() => {
+            isCarouselPaused = false;
+            startCustomAutoScroll(swiper);
+        }, 100);
+    }
+}
+
+// Закрытие модалок по клику вне области
+imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+        closeImageModal();
+    }
+});
+
+contactsModal.addEventListener('click', (e) => {
+    if (e.target === contactsModal) {
+        closeContactsModal();
+    }
+});
+
+// Закрытие по Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (imageModal.classList.contains('active')) {
+            closeImageModal();
+        }
+        if (contactsModal.classList.contains('active')) {
+            closeContactsModal();
+        }
+    }
+});
+
+// ============================================
+// ОТКРЫТИЕ МОДАЛКИ КОНТАКТОВ ПО КЛИКУ НА LOTTIE
+// ============================================
+const lottieContainer = document.querySelector('.lottie-container');
+if (lottieContainer) {
+    lottieContainer.addEventListener('click', openContactsModal);
+}
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// ============================================
+document.addEventListener('DOMContentLoaded', async () => {
+    // Сначала загружаем данные проектов
+    await loadProjectsData();
+    console.log('Загружено проектов:', projectsData.length);
+    // Затем загружаем карусель
+    loadCarouselImages();
+    
+    // Слушаем изменения в localStorage (если данные обновляются в другой вкладке)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'projectsData') {
+            console.log('Обнаружены изменения в localStorage, перезагружаем данные');
+            loadProjectsData().then(() => {
+                loadCarouselImages();
+            });
+        }
+    });
+    
+    const initLottieWhenReady = () => {
+        if (typeof lottie !== 'undefined') {
+            initLottieAnimations();
+            return true;
+        }
+        return false;
+    };
+    
+    if (!initLottieWhenReady()) {
+        const checkLottie = setInterval(() => {
+            if (initLottieWhenReady()) clearInterval(checkLottie);
+        }, 100);
+        setTimeout(() => clearInterval(checkLottie), 5000);
+    }
+});
+
+</script>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+</body>
+</html>

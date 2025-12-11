@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script>
+    // Самый ранний перехват ошибок расширений браузера
+    (function() {
+        'use strict';
+        const isExtensionError = function(msg) {
+            if (!msg) return false;
+            const str = String(msg);
+            return str.includes('Could not establish connection') || 
+                   str.includes('Receiving end does not exist') ||
+                   str.includes('Extension context invalidated') ||
+                   str.includes('chrome-extension://') ||
+                   str.includes('moz-extension://') ||
+                   str.includes('safari-extension://') ||
+                   str.includes('message port closed') ||
+                   str.includes('A listener indicated an asynchronous response') ||
+                   str.includes('The message port closed before a response was received') ||
+                   str.includes('No tab with id') ||
+                   str.includes('Cannot access contents of') ||
+                   str.includes('content_script.js') ||
+                   str.includes('Cannot read properties of undefined') ||
+                   str.includes("reading 'control'") ||
+                   str.toLowerCase().includes('extension');
+        };
+        
+        // Перехватываем ошибки в Promise - ДО загрузки страницы
+        if (typeof window !== 'undefined') {
+            // Используем capture phase для максимально раннего перехвата
+            const rejectionHandler = function(event) {
+                try {
+                    const error = event.reason;
+                    let errorMsg = '';
+                    
+                    if (error) {
+                        if (typeof error === 'object') {
+                            errorMsg = error.message || error.toString() || JSON.stringify(error);
+                            // Также проверяем stack trace
+                            if (error.stack && isExtensionError(error.stack)) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                event.stopImmediatePropagation();
+                                return false;
+                            }
+                        } else if (typeof error === 'string') {
+                            errorMsg = error;
+                        } else {
+                            errorMsg = String(error);
+                        }
+                    }
+                    
+                    // Проверяем сообщение об ошибке
+                    if (isExtensionError(errorMsg)) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+                        return false;
+                    }
+                    
+                    // Проверяем строковое представление события
+                    const eventString = String(event);
+                    if (isExtensionError(eventString)) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+                        return false;
+                    }
+                } catch(e) {
+                    // Игнорируем ошибки в обработчике
+                }
+            };
+            
+            // Добавляем обработчик с максимальным приоритетом
+            window.addEventListener('unhandledrejection', rejectionHandler, { capture: true, passive: false });
+            
+            // Также добавляем через addEventListener с once: false для надежности
+            if (window.addEventListener) {
+                window.addEventListener('unhandledrejection', rejectionHandler, true);
+            }
+            
+            // Дополнительный перехват на уровне window
+            window.addEventListener('error', function(event) {
+                try {
+                    const errorMsg = event.message || event.error?.message || String(event.error || '');
+                    if (isExtensionError(errorMsg)) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+                        return false;
+                    }
+                } catch(e) {
+                    // Игнорируем ошибки в обработчике
+                }
+            }, { capture: true, passive: false });
+        }
+        
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        console.error = function(...args) {
+            try {
+                const msg = args.join(' ');
+                if (isExtensionError(msg)) return;
+                originalError.apply(console, args);
+            } catch(e) {
+                originalError.apply(console, args);
+            }
+        };
+        
+        console.warn = function(...args) {
+            try {
+                const msg = args.join(' ');
+                if (isExtensionError(msg)) return;
+                originalWarn.apply(console, args);
+            } catch(e) {
+                originalWarn.apply(console, args);
+            }
+        };
+        
+        // Также перехватываем console.log на случай, если ошибка там
+        console.log = function(...args) {
+            try {
+                const msg = args.join(' ');
+                if (isExtensionError(msg)) return;
+                originalLog.apply(console, args);
+            } catch(e) {
+                originalLog.apply(console, args);
+            }
+        };
+        
+        // Перехватываем ошибки в window.onerror
+        if (typeof window !== 'undefined') {
+            const originalOnError = window.onerror;
+            window.onerror = function(message, source, lineno, colno, error) {
+                if (isExtensionError(message) || (error && isExtensionError(error.message))) {
+                    return true; // Подавляем ошибку
+                }
+                if (originalOnError) {
+                    return originalOnError.call(this, message, source, lineno, colno, error);
+                }
+                return false;
+            };
+        }
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка - Calipso Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/figma-variables.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/admin-editor.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+<div class="main admin-main">
+    <!-- Панель управления -->
+    <div class="admin-controls">
+        <button class="admin-btn edit-mode-btn" id="edit-mode-btn">Режим редактирования</button>
+        <button class="admin-btn save-btn" id="save-btn" style="display: none;">Подтвердить изменения</button>
+        <button class="admin-btn cancel-btn" id="cancel-btn" style="display: none;">Отмена</button>
+        <a href="index.html" class="admin-btn view-site-btn">Просмотр сайта</a>
+    </div>
+
+    <!-- Контейнер с видео и Lottie -->
+    <div class="video-lottie-container">
+        <div class="video-container">
+            <video class="top-video" autoplay muted loop playsinline>
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+            
+            <!-- Lottie контейнер в нижнем правом углу -->
+            <div class="lottie-container">
+                <div id="lottie-animation" class="lottie-animation"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Контейнер с каруселью -->
+    <div class="content-container admin-carousel-container">
+        <div class="swiper carousel-swiper" id="admin-carousel">
+            <div class="swiper-wrapper" id="carousel-track">
+                <!-- Картинки загружаются через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер с папками проектов -->
+    <div class="admin-footer" id="admin-footer">
+        <div class="footer-resize-handle" id="footer-resize-handle"></div>
+        <div class="admin-footer-buttons">
+            <button class="admin-btn add-project-btn" id="add-project-btn">+ Добавить проект</button>
+            <button class="admin-btn deploy-btn" id="deploy-btn">Залить изменения на сайт</button>
+        </div>
+        <div class="projects-folders" id="projects-folders">
+            <!-- Папки проектов загружаются через JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Индикатор сохранения -->
+<div class="saving" id="saving-indicator">Сохранение...</div>
+
+<!-- Модалка для просмотра картинок -->
+<div class="modal" id="image-modal">
+    <div class="modal-content image-modal-content">
+        <div class="modal-close-lottie" id="modal-close-lottie"></div>
+        <img class="modal-image" id="modal-image" src="" alt="">
+    </div>
+</div>
+
+<!-- Модалка контактов -->
+<div class="modal" id="contacts-modal">
+    <div class="modal-content contacts-modal-content">
+        <div class="modal-close-lottie" id="contacts-modal-close-lottie"></div>
+        <div class="contacts-content">
+            <h2>Контакты</h2>
+            <p>Email: info@calipso.design</p>
+            <p>Телефон: +7 (XXX) XXX-XX-XX</p>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка создания проекта -->
+<div class="modal" id="new-project-modal">
+    <div class="modal-content new-project-modal-content">
+        <h2>Создать новый проект</h2>
+        <div class="form-group">
+            <label>Название проекта:</label>
+            <input type="text" id="new-project-name" class="form-input" placeholder="Введите название проекта" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
+        </div>
+        <div class="form-group">
+            <label>ID проекта (латиница, без пробелов):</label>
+            <input type="text" id="new-project-id" class="form-input" placeholder="project-name" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
+            <small class="form-hint">Будет использовано для URL и имени папки</small>
+        </div>
+        <div class="form-group">
+            <label>Описание:</label>
+            <textarea id="new-project-description" class="form-textarea" rows="3" placeholder="Описание проекта" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Превью изображение:</label>
+            <input type="file" id="new-project-preview-file" class="form-input-file" accept="image/*">
+            <div class="preview-image-container" id="preview-image-container" style="display: none;">
+                <img id="preview-image-preview" src="" alt="Превью" class="preview-image">
+                <button type="button" class="remove-preview-btn" id="remove-preview-btn">×</button>
+            </div>
+            <input type="text" id="new-project-preview" class="form-input" placeholder="Или введите путь вручную" style="margin-top: 10px;" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
+            <small class="form-hint">Выберите файл или укажите путь к изображению</small>
+        </div>
+        <div class="modal-actions">
+            <button class="admin-btn save-btn" id="create-project-btn">Создать проект</button>
+            <button class="admin-btn cancel-btn" id="cancel-create-btn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="scripts/admin-editor.js"></script>
+</body>
+</html>

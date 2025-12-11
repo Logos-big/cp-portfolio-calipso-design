@@ -1,0 +1,33 @@
+{
+  "projects": [
+    {
+      "id": "project1",
+      "name": "Основной проект",
+      "description": "Основной проект портфолио. Здесь собраны все работы.",
+      "images": [
+        "images/photos/ComfyUI_00070_.png",
+        "images/photos/ComfyUI_00071_.png",
+        "images/photos/ComfyUI_00076_.png",
+        "images/photos/ComfyUI_00083_.png",
+        "images/photos/ComfyUI_00090_.png",
+        "images/photos/ComfyUI_00096_.png",
+        "images/photos/ComfyUI_00097_.png",
+        "images/photos/ComfyUI_00102_.png",
+        "images/photos/ComfyUI_00105_.png"
+      ],
+      "carouselImages": [
+        "images/photos/ComfyUI_00070_.png",
+        "images/photos/ComfyUI_00071_.png",
+        "images/photos/ComfyUI_00076_.png",
+        "images/photos/ComfyUI_00083_.png",
+        "images/photos/ComfyUI_00090_.png",
+        "images/photos/ComfyUI_00096_.png",
+        "images/photos/ComfyUI_00097_.png",
+        "images/photos/ComfyUI_00102_.png",
+        "images/photos/ComfyUI_00105_.png"
+      ],
+      "folder": "основной-проект"
+    }
+  ]
+}
+

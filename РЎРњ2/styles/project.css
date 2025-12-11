@@ -1,0 +1,159 @@
+.project-page {
+    min-height: 100vh;
+    background-color: #D4D4D4;
+    padding: 20px;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.delete-project-btn {
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-project-btn:hover {
+    background-color: #d32f2f;
+}
+
+.project-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+}
+
+.back-button {
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.project-description-section {
+    margin-bottom: 40px;
+}
+
+.description-content {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #333;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.comparison-section {
+    margin-top: 40px;
+}
+
+.comparison-carousels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.comparison-carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.carousel-label {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #000;
+    text-align: center;
+    margin: 0;
+}
+
+.comparison-swiper {
+    width: 100%;
+    height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.comparison-swiper .swiper-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.comparison-swiper .swiper-slide {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.comparison-swiper .swiper-slide:hover {
+    transform: scale(1.05);
+}
+
+.comparison-swiper .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.modal-upload-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.upload-image-btn {
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.upload-image-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+@media (max-width: 1024px) {
+    .comparison-carousels {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-swiper {
+        height: 400px;
+    }
+}
+

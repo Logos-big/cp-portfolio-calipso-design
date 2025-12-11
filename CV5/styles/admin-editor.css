@@ -1,0 +1,876 @@
+/* Стили для админки - визуально повторяет главную страницу */
+
+.admin-main {
+    position: relative;
+}
+
+/* Панель управления */
+.admin-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-btn {
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: 'Montserrat', sans-serif;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.admin-btn:hover {
+    background-color: rgba(0, 0, 0, 1);
+    transform: scale(1.05);
+}
+
+.edit-mode-btn.active {
+    background-color: #4CAF50;
+}
+
+.save-btn {
+    background-color: #2196F3;
+}
+
+.save-btn:hover {
+    background-color: #1976D2;
+}
+
+.cancel-btn {
+    background-color: #f44336;
+}
+
+.cancel-btn:hover {
+    background-color: #d32f2f;
+}
+
+.view-site-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-footer-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.add-project-btn {
+    background-color: #4CAF50;
+    flex: 1;
+    height: 40px;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.add-project-btn:hover {
+    background-color: #45a049;
+}
+
+.deploy-btn {
+    background-color: #FF9800;
+    flex: 1;
+    height: 40px;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+}
+
+.deploy-btn:hover {
+    background-color: #F57C00;
+}
+
+/* Режим редактирования */
+.edit-mode .carousel-item {
+    position: relative;
+}
+
+.edit-mode .carousel-item img {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edit-mode .carousel-item:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    filter: brightness(0.9);
+}
+
+.edit-mode .carousel-item::before {
+    content: '✎ Заменить';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.edit-mode .carousel-item:hover::before {
+    opacity: 1;
+}
+
+.edit-mode .carousel-item::after {
+    content: '⋮⋮';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.edit-mode .carousel-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.edit-mode .carousel-item.drag-over {
+    border: 2px dashed #2196F3;
+    border-radius: 4px;
+}
+
+.swiper-slide.drag-over {
+    border: 2px dashed #4CAF50;
+    border-radius: 4px;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Футер с папками проектов */
+.admin-footer {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    padding-top: 32px;
+    padding-bottom: 20px;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+    height: 40vh;
+    min-height: 200px;
+    max-height: 80vh;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+    resize: none; /* Отключаем стандартный resize */
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-footer .projects-folders {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+/* Ручка для изменения размера */
+.footer-resize-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.15);
+    cursor: ns-resize !important;
+    z-index: 10000 !important;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: auto !important;
+    touch-action: none;
+    display: block !important;
+}
+
+.footer-resize-handle:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.footer-resize-handle:active {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.footer-resize-handle::before {
+    content: '⋮⋮';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 20px;
+    line-height: 1;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.projects-folders {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px !important;
+    row-gap: 2px !important;
+    column-gap: 2px !important;
+    padding: 15px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.project-folder {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: default;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    align-items: stretch;
+}
+
+.folder-main-content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.folder-text-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.folder-right-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.project-folder:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.folder-drag-thumbnail {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: move;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.folder-drag-thumbnail.in-carousel {
+    border-color: #4CAF50;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3), 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.folder-drag-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: #4CAF50;
+    cursor: grab;
+}
+
+.folder-drag-thumbnail.in-carousel:hover {
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.5), 0 4px 16px rgba(76, 175, 80, 0.6);
+}
+
+.folder-drag-thumbnail:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.folder-drag-thumbnail.dragging {
+    opacity: 0.5;
+    transform: scale(0.9);
+}
+
+.folder-drag-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: auto;
+    transition: filter 0.2s ease;
+}
+
+.folder-drag-thumbnail:hover img {
+    filter: brightness(0.9);
+}
+
+.folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    gap: 8px;
+    min-width: 0;
+}
+
+.folder-name-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.folder-description-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.folder-description {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.4;
+    padding: 0;
+    word-wrap: break-word;
+    flex: 1;
+    min-width: 0;
+    transition: opacity 0.2s ease;
+}
+
+.folder-description:hover {
+    opacity: 0.7;
+}
+
+.folder-description-input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.folder-desc-buttons {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    align-items: center;
+}
+
+.folder-desc-save-btn {
+    background-color: rgba(76, 175, 80, 0.7);
+    border: none;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    color: white;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-desc-save-btn:hover {
+    background-color: rgba(76, 175, 80, 0.9);
+}
+
+.folder-desc-cancel-btn {
+    background-color: rgba(244, 67, 54, 0.7);
+    border: none;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    color: white;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-desc-cancel-btn:hover {
+    background-color: rgba(244, 67, 54, 0.9);
+}
+
+.folder-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #000;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+.folder-name:hover {
+    opacity: 0.7;
+}
+
+.folder-edit-icon {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: #333;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-edit-icon:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.folder-name-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.folder-name-save-btn {
+    background-color: rgba(76, 175, 80, 0.7);
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: white;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-name-save-btn:hover {
+    background-color: rgba(76, 175, 80, 0.9);
+}
+
+.folder-name-cancel-btn {
+    background-color: rgba(244, 67, 54, 0.7);
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: white;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-name-cancel-btn:hover {
+    background-color: rgba(244, 67, 54, 0.9);
+}
+
+.folder-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.folder-thumbnail {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.folder-thumbnail.empty {
+    background-color: rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: 0.8rem;
+}
+
+/* Кнопка удаления проекта */
+.folder-delete-btn {
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.folder-delete-btn:hover {
+    background-color: rgba(255, 0, 0, 0.9);
+}
+
+/* Ячейки для изображений */
+.folder-cells {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 0;
+    width: 100%;
+    min-width: 0;
+    align-items: start;
+    grid-auto-rows: auto;
+}
+
+.folder-cell {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: none;
+    border-radius: 0;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    height: auto;
+    align-self: start;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: auto;
+}
+
+.cell-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+    color: #333;
+    padding: 0;
+    width: 100%;
+}
+
+.cell-header-title {
+    flex: 1;
+}
+
+.cell-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 0;
+    width: 100%;
+    min-width: 0;
+    align-content: flex-start;
+    height: auto;
+    min-height: auto;
+}
+
+.cell-image-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
+    overflow: hidden;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+.cell-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cell-image-view {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    display: none;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.cell-image-view:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.cell-image-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    display: none;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.cell-image-remove:hover {
+    background-color: rgba(255, 0, 0, 0.9);
+}
+
+.cell-image-wrapper:hover .cell-image-view,
+.cell-image-wrapper:hover .cell-image-remove {
+    display: flex;
+}
+
+.cell-image-wrapper:hover .cell-image-remove {
+    display: block;
+}
+
+.cell-add-btn-header {
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 300;
+    color: rgba(0, 0, 0, 0.6);
+    transition: color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.cell-add-btn-header:hover {
+    color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Индикатор изменений */
+.changes-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ff9800;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: none;
+    z-index: 2000;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.changes-indicator.show {
+    display: block;
+}
+
+/* Анимация сохранения */
+.saving {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    z-index: 3000;
+    font-family: 'Montserrat', sans-serif;
+    display: none;
+}
+
+.saving.show {
+    display: block;
+}
+
+/* Модалка создания проекта */
+.new-project-modal-content {
+    max-width: 500px;
+    width: 90%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 20px auto;
+    position: relative;
+    z-index: 3000;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.new-project-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+
+.form-input-file {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.preview-image-container {
+    position: relative;
+    margin-top: 10px;
+    display: inline-block;
+    max-width: 200px;
+}
+
+.preview-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.remove-preview-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.remove-preview-btn:hover {
+    background-color: #d32f2f;
+}
+

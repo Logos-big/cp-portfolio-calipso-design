@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "id": "project-1",
+      "name": "Проект 1",
+      "description": "Описание проекта 1. Здесь можно добавить подробную информацию о проекте, его особенностях и достижениях.",
+      "folder": "project-1",
+      "order": 0,
+      "previewImage": "images/photos/ComfyUI_00070_.png",
+      "photos": [
+        "images/photos/ComfyUI_00070_.png",
+        "images/photos/ComfyUI_00071_.png",
+        "images/photos/ComfyUI_00076_.png"
+      ],
+      "drawings": [
+        "images/photos/ComfyUI_00083_.png",
+        "images/photos/ComfyUI_00090_.png"
+      ],
+      "renders": [
+        "images/photos/ComfyUI_00096_.png",
+        "images/photos/ComfyUI_00097_.png",
+        "images/photos/ComfyUI_00102_.png",
+        "images/photos/ComfyUI_00105_.png"
+      ],
+      "carouselOrder": {
+        "photos": [0, 1, 2],
+        "drawings": [0, 1],
+        "renders": [0, 1, 2, 3]
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проект - Calipso Design</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/project.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+    <div class="project-page">
+        <!-- Хедер проекта -->
+        <header class="project-header" id="project-header">
+            <h1 class="project-title" id="project-title">Название проекта</h1>
+            <div class="header-buttons">
+                <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
+            </div>
+        </header>
+
+        <!-- Блок описания -->
+        <section class="project-description-section">
+            <div class="description-content" id="project-description">
+                Описание проекта...
+            </div>
+        </section>
+
+        <!-- Блок с тремя колоннами -->
+        <section class="comparison-section">
+            <div class="comparison-images-container">
+                <!-- Колонна чертежей -->
+                <div class="comparison-column">
+                    <h3 class="image-label">Чертежи</h3>
+                    <div class="comparison-column-content" id="drawings-column">
+                        <!-- Загружается через JS -->
+                    </div>
+                </div>
+                
+                <!-- Колонна фото -->
+                <div class="comparison-column">
+                    <h3 class="image-label">Фото</h3>
+                    <div class="comparison-column-content" id="photos-column">
+                        <!-- Загружается через JS -->
+                    </div>
+                </div>
+                
+                <!-- Колонна рендеров -->
+                <div class="comparison-column">
+                    <h3 class="image-label">Рендеры</h3>
+                    <div class="comparison-column-content" id="renders-column">
+                        <!-- Загружается через JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Модалка для увеличения изображений -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content image-modal-content">
+            <div class="modal-close-lottie" id="modal-close-lottie"></div>
+            <img class="modal-image" id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <script src="scripts/project.js"></script>
+</body>
+</html>
+
