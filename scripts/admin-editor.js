@@ -1470,9 +1470,32 @@ async function deployChanges() {
         // Сохраняем в localStorage
         localStorage.setItem('projectsData', JSON.stringify({ projects: projectsData }));
         
-        // Генерируем и скачиваем projects.json
+        // Генерируем projects.json
         const projectsJson = JSON.stringify({ projects: projectsData }, null, 2);
-        downloadFile(projectsJson, 'projects.json', 'application/json');
+        
+        // Пытаемся сохранить напрямую в файл через fetch (работает только на локальном сервере)
+        let savedToFile = false;
+        try {
+            const response = await fetch('data/projects.json', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: projectsJson
+            });
+            
+            if (response.ok) {
+                savedToFile = true;
+                console.log('✓ Файл data/projects.json обновлен на сервере');
+            }
+        } catch (e) {
+            console.log('Не удалось сохранить напрямую на сервер (это нормально для GitHub Pages)');
+        }
+        
+        // Если не удалось сохранить напрямую, скачиваем файл для ручной замены
+        if (!savedToFile) {
+            downloadFile(projectsJson, 'projects.json', 'application/json');
+        }
         
         // Небольшая задержка перед скачиванием HTML файлов
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -1508,10 +1531,20 @@ async function deployChanges() {
         }
         
         // Показываем информацию о развертывании
-        let message = 'Файлы готовы для развертывания!\\n\\n';
-        message += 'Скачанные файлы:\\n';
-        message += '1. projects.json - замените файл data/projects.json\\n';
-        message += `2. HTML файлы проектов (${projectsData.length} файлов)\\n`;
+        let message = savedToFile 
+            ? '✓ Файл data/projects.json обновлен на сервере!\\n\\n'
+            : 'Файлы готовы для развертывания!\\n\\n';
+        
+        if (!savedToFile) {
+            message += 'ВАЖНО: Для публикации изменений на GitHub Pages:\\n';
+            message += '1. Скачанный файл projects.json замените в папке data/projects.json\\n';
+            message += '2. Выполните команды в терминале:\\n';
+            message += '   git add data/projects.json\\n';
+            message += '   git commit -m "Обновление проектов из админки"\\n';
+            message += '   git push origin main\\n\\n';
+        }
+        
+        message += `HTML файлы проектов (${projectsData.length} файлов) скачаны.\\n`;
         message += '   - Переместите их в корневую папку проекта\\n';
         message += '   - Переименуйте project-{id}.html в project.html или создайте символические ссылки\\n\\n';
         
@@ -1526,7 +1559,9 @@ async function deployChanges() {
             message += '\\n';
         }
         
-        message += 'После замены файлов обновите страницу сайта.';
+        message += savedToFile 
+            ? 'Изменения применены! Обновите страницу сайта через несколько минут.'
+            : 'После замены файлов и загрузки на GitHub обновите страницу сайта.';
         
         alert(message);
         

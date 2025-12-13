@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11111111111 - Calipso Design</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/project.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+    <div class="project-page">
+        <!-- Хедер проекта -->
+        <header class="project-header" id="project-header">
+            <h1 class="project-title" id="project-title">11111111111</h1>
+            <div class="header-buttons">
+                <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
+            </div>
+        </header>
+
+        <!-- Блок описания -->
+        <section class="project-description-section">
+            <div class="description-content" id="project-description">
+                111111111111
+            </div>
+        </section>
+
+        <!-- Блок с синхронной каруселью сравнения -->
+        <section class="comparison-section">
+            <div class="comparison-carousels">
+                <!-- Карусель чертежей -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Чертежи</h3>
+                    <div class="swiper comparison-swiper" id="drawings-swiper">
+                        <div class="swiper-wrapper" id="drawings-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карусель фото -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Фото</h3>
+                    <div class="swiper comparison-swiper" id="photos-swiper">
+                        <div class="swiper-wrapper" id="photos-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карусель рендеров -->
+                <div class="comparison-carousel-wrapper">
+                    <h3 class="carousel-label">Рендеры</h3>
+                    <div class="swiper comparison-swiper" id="renders-swiper">
+                        <div class="swiper-wrapper" id="renders-wrapper">
+                            <!-- Загружается через JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Модалка для увеличения изображений -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content image-modal-content">
+            <div class="modal-close-lottie" id="modal-close-lottie"></div>
+            <img class="modal-image" id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // Данные проекта
+        const projectData = {"id":"11111111111","name":"11111111111","description":"111111111111","folder":"11111111111","order":5,"previewImage":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAKWAyADASIAAhEBAxEB/8QAGgABAQEBAQEBAAAAAAAAAAAAAAQFAwECBv/EADYQAQABAgQDBQYGAgIDAAAAAAABAgUDBDVzBhGxEjQ2crIhUWFxgqExUmJjgcElQRbRU5Hw/8QAGQEBAQEBAQEAAAAAAAAAAAAAAAIBAwQF/8QAJhEBAAIABgMAAgMBAQAAAAAAAAECERIhMTJBA2HwIkJRcYEzUv/aAAwDAQACEQMRAD8A/NAPlvigAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf//Z","photos":[],"drawings":[],"renders":[],"carouselOrder":{"photos":[],"drawings":[],"renders":[]}};
+        
+        // Загрузка данных и инициализация каруселей
+        let drawingsSwiper = null;
+        let photosSwiper = null;
+        let rendersSwiper = null;
+
+        function loadCarousel(swiperId, wrapperId, images, order) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+            
+            wrapper.innerHTML = '';
+            
+            const sortedImages = order ? order.map(i => images[i]).filter(Boolean) : images;
+            
+            sortedImages.forEach((imagePath) => {
+                if (!imagePath || imagePath.trim() === '') return;
+                
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = '';
+                img.onclick = () => openImageModal(imagePath);
+                
+                slide.appendChild(img);
+                wrapper.appendChild(slide);
+            });
+        }
+
+        function initSynchronizedCarousels() {
+            const drawings = projectData.drawings || [];
+            const photos = projectData.photos || [];
+            const renders = projectData.renders || [];
+            
+            const carouselOrder = projectData.carouselOrder || {};
+            
+            loadCarousel('drawings-swiper', 'drawings-wrapper', drawings, carouselOrder.drawings);
+            loadCarousel('photos-swiper', 'photos-wrapper', photos, carouselOrder.photos);
+            loadCarousel('renders-swiper', 'renders-wrapper', renders, carouselOrder.renders);
+            
+            drawingsSwiper = new Swiper('#drawings-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                freeMode: true,
+                watchSlidesProgress: true,
+            });
+            
+            photosSwiper = new Swiper('#photos-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                freeMode: true,
+                watchSlidesProgress: true,
+            });
+            
+            rendersSwiper = new Swiper('#renders-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                freeMode: true,
+                watchSlidesProgress: true,
+            });
+            
+            // Синхронизация
+            [drawingsSwiper, photosSwiper, rendersSwiper].forEach(swiper => {
+                if (swiper) {
+                    swiper.on('slideChange', () => {
+                        syncCarousels();
+                    });
+                }
+            });
+        }
+
+        function syncCarousels() {
+            if (!photosSwiper || !drawingsSwiper || !rendersSwiper) return;
+            
+            const activeIndex = photosSwiper.activeIndex;
+            drawingsSwiper.slideTo(activeIndex);
+            rendersSwiper.slideTo(activeIndex);
+        }
+
+        function openImageModal(imagePath) {
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            if (modal && modalImage) {
+                modalImage.src = imagePath;
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSynchronizedCarousels();
+            
+            const modal = document.getElementById('image-modal');
+            const modalClose = document.getElementById('modal-close-lottie');
+            
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeImageModal();
+                    }
+                });
+            }
+            
+            if (modalClose) {
+                modalClose.addEventListener('click', closeImageModal);
+            }
+        });
+    </script>
+</body>
+</html>
